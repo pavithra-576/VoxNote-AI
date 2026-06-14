@@ -3,8 +3,8 @@
 > Turn lectures into knowledge — instantly.
 
 VoxNote AI converts any lecture, meeting, or audio recording into structured study notes, smart flashcards, and interactive quizzes using **Whisper** for transcription and **Groq (Llama 3.3 70B)** for AI analysis.
+   ![Uploading image.png…]()
 
-![VoxNote AI Banner](https://via.placeholder.com/1000x400/0d1117/63b3ed?text=VoxNote+AI)
 
 ---
 
