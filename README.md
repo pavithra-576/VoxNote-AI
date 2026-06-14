@@ -4,6 +4,8 @@ VoxNote AI converts any lecture, meeting, or audio recording into structured stu
 
 <img width="1720" height="877" alt="image" src="https://github.com/user-attachments/assets/811938be-1d81-4f1a-a068-8f1a9f388277" />
 
+
+
 **✨ Features**
 
 🎤 Upload or Record — drag & drop an audio file, or record live from your microphone
