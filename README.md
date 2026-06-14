@@ -151,24 +151,6 @@ This runs the Groq analysis on a sample transcript and returns a full JSON respo
 | Max upload size | `app.py` → `MAX_CONTENT_LENGTH` | Default 500 MB |
 | Backend URL | `script.js` → `BACKEND` constant | Change if hosting backend elsewhere |
 
----
-
-## 🗺 Roadmap
-
-- [x] Whisper transcription
-- [x] Groq-powered summary, key points, flashcards & quiz
-- [x] Drag & drop upload
-- [x] Live voice recording
-- [x] Flip flashcards
-- [x] Quiz scoring system
-- [x] PDF export
-- [x] Copy notes & session history
-- [ ] User accounts & cloud history
-- [ ] Multi-language support
-- [ ] Export to Anki / Notion
-
----
-
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
