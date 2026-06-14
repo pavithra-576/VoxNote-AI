@@ -45,7 +45,7 @@ VoxNote-AI/
 │   ├── app.py             # Flask server & routes
 │   ├── stage2_processor.py # Groq AI analysis pipeline
 │   ├── requirements.txt
-│   └── .env               # API keys (not committed)
+│   └── .env               
 ├── screenshots/
 │   └── homepage.png
 └── README.md
