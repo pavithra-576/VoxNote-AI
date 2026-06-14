@@ -1,13 +1,8 @@
-# 🎙 VoxNote AI
+<img width="1907" height="903" alt="image" src="https://github.com/user-attachments/assets/14d0dada-73cc-4ef1-a253-926f643b4775" /><img width="1907" height="903" alt="image" src="https://github.com/user-attachments/assets/73582da7-c20f-471a-8ac6-f4084423419c" /><img width="1907" height="903" alt="image" src="https://github.com/user-attachments/assets/5cb28dfd-07f3-4b1c-af58-2d10ef7ef5fb" /># 🎙 VoxNote AI
 
 > Turn lectures into knowledge — instantly.
 
 VoxNote AI converts any lecture, meeting, or audio recording into structured study notes, smart flashcards, and interactive quizzes using **Whisper** for transcription and **Groq (Llama 3.3 70B)** for AI analysis.
-   ![Uploading image.png…]()
-
-
----
-
 ## ✨ Features
 
 - 🎤 **Upload or Record** — drag & drop an audio file, or record live from your microphone
