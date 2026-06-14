@@ -1,7 +1,193 @@
-#🎙 VoxNote AI
+# 🎙 VoxNote AI
+
 > Turn lectures into knowledge — instantly.
 
 VoxNote AI converts any lecture, meeting, or audio recording into structured study notes, smart flashcards, and interactive quizzes using **Whisper** for transcription and **Groq (Llama 3.3 70B)** for AI analysis.
+
+---
+
+## 📸 Preview
+   <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoxNote AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="ambient ambient-1"></div>
+<div class="ambient ambient-2"></div>
+<div class="ambient ambient-3"></div>
+
+<div class="wrapper">
+
+  <nav>
+    <div class="logo">
+      <div class="logo-icon">🎙</div>
+      VoxNote AI
+    </div>
+    <div class="nav-right">
+      <div class="confidence-badge" id="confidenceBadge" style="display:none">
+        <span class="conf-dot"></span>
+        AI Confidence: <strong id="confValue">96%</strong>
+      </div>
+      <div class="nav-pill">AI-Powered Learning</div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-badge">Powered by AI</div>
+    <h1>Turn lectures into<br><em>knowledge</em></h1>
+    <p>Upload or record any audio and watch it transform into structured notes, smart flashcards, and interactive quizzes — instantly.</p>
+
+    <div class="upload-zone">
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="modeUpload" onclick="setMode('upload')">📁 Upload File</button>
+        <button class="mode-btn" id="modeRecord" onclick="setMode('record')">🎤 Record Live</button>
+      </div>
+
+      <div id="uploadPanel">
+        <div class="dropzone" id="dropzone">
+          <div class="drop-icon">🔊</div>
+          <h3>Drop your audio file here</h3>
+          <p>or click to browse</p>
+          <div class="file-formats">
+            <span class="fmt-tag">.mp3</span>
+            <span class="fmt-tag">.wav</span>
+            <span class="fmt-tag">.m4a</span>
+            <span class="fmt-tag">.mp4</span>
+          </div>
+        </div>
+        <input type="file" id="fileInput" accept=".mp3,.wav,.m4a,.mp4,.ogg,.webm">
+        <div class="file-selected" id="fileSelected">
+          <span>🎵</span>
+          <span class="file-name" id="fileName"></span>
+          <span id="fileSize"></span>
+        </div>
+      </div>
+
+      <div id="recordPanel" style="display:none">
+        <div class="record-zone" id="recordZone">
+          <div class="record-visualizer">
+            <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
+            <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
+            <div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div>
+          </div>
+          <div class="record-status" id="recordStatus">Ready to record</div>
+          <div class="record-timer" id="recordTimer">00:00</div>
+          <div class="record-btns">
+            <button class="btn-record-start" id="btnRecordStart" onclick="startRecording()">● Start Recording</button>
+            <button class="btn-record-stop" id="btnRecordStop" onclick="stopRecording()" style="display:none">■ Stop</button>
+          </div>
+        </div>
+        <div class="file-selected" id="recordSelected" style="display:none">
+          <span>🎙</span>
+          <span class="file-name" id="recordName"></span>
+          <span id="recordSize"></span>
+        </div>
+      </div>
+
+      <button class="btn-process" onclick="uploadFile()">
+        <span>✦ Process Audio</span>
+      </button>
+    </div>
+  </section>
+
+  <div class="loader-wrap" id="loader">
+    <div class="loader-visual">
+      <div class="loader-ring"></div>
+      <div class="loader-ring"></div>
+      <div class="loader-ring"></div>
+      <div class="loader-center"></div>
+    </div>
+    <p>Transcribing &amp; analyzing your audio</p>
+    <div class="loader-steps">
+      <div class="loader-step active" id="step1"><div class="loader-step-dot"></div> Transcribing</div>
+      <div class="loader-step" id="step2"><div class="loader-step-dot"></div> Summarizing</div>
+      <div class="loader-step" id="step3"><div class="loader-step-dot"></div> Generating</div>
+    </div>
+  </div>
+
+  <section id="dashboard">
+    <div class="section-label">Your Results</div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Key Points</div>
+        <div class="stat-value" id="statPoints">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Flashcards</div>
+        <div class="stat-value" id="statCards">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Quiz Score</div>
+        <div class="stat-value" id="statScore">—</div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn-action" onclick="downloadPDF()">📄 Export PDF</button>
+      <button class="btn-action" onclick="copySummary()">📋 Copy Notes</button>
+      <button class="btn-action" id="btnHistory" onclick="loadHistory()" style="display:none">🕘 Last Session</button>
+    </div>
+
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('transcript', this)">📝 Transcript</button>
+      <button class="tab-btn" onclick="switchTab('summary', this)">📌 Summary</button>
+      <button class="tab-btn" onclick="switchTab('keypoints', this)">🔑 Key Points</button>
+      <button class="tab-btn" onclick="switchTab('flashcards', this)">🧠 Flashcards</button>
+      <button class="tab-btn" onclick="switchTab('quiz', this)">❓ Quiz</button>
+    </div>
+
+    <div id="tab-transcript" class="tab-panel active">
+      <div class="transcript-box" id="transcript">Transcript will appear here after processing.</div>
+    </div>
+    <div id="tab-summary" class="tab-panel">
+      <div class="summary-box" id="summary"></div>
+    </div>
+    <div id="tab-keypoints" class="tab-panel">
+      <ul class="key-points-list" id="keyPoints"></ul>
+    </div>
+    <div id="tab-flashcards" class="tab-panel">
+      <p class="hint-text">💡 Click any card to flip and reveal the answer</p>
+      <div class="flashcards-grid" id="flashcards"></div>
+    </div>
+    <div id="tab-quiz" class="tab-panel">
+      <div class="quiz-scoreboard" id="scoreBoard" style="display:none">
+        <span class="score-label">Final Score</span>
+        <span class="score-num" id="scoreDisplay">0 / 0</span>
+        <span class="score-emoji" id="scoreEmoji">🎉</span>
+      </div>
+      <div class="quiz-list" id="quiz"></div>
+      <button class="btn-submit-quiz" id="btnSubmitQuiz" onclick="submitQuiz()" style="display:none">
+        ✦ Submit Quiz
+      </button>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
+<!-- 
+To add more screenshots, upload them to a "screenshots" folder in your repo
+and reference them like this:
+
+![Dashboard](screenshots/dashboard.png)
+![Flashcards](screenshots/flashcards.png)
+![Quiz](screenshots/quiz.png)
+-->
+
+---
 
 ## ✨ Features
 
@@ -42,8 +228,8 @@ VoxNote-AI/
 │   ├── app.py             # Flask server & routes
 │   ├── stage2_processor.py # Groq AI analysis pipeline
 │   ├── requirements.txt
-│   └── .env               # API keys (not committed)
-└── README.md
+│   └── .env               
+├── README.md
 ```
 
 ---
@@ -134,6 +320,23 @@ This runs the Groq analysis on a sample transcript and returns a full JSON respo
 | Backend URL | `script.js` → `BACKEND` constant | Change if hosting backend elsewhere |
 
 ---
+
+## 🗺 Roadmap
+
+- [x] Whisper transcription
+- [x] Groq-powered summary, key points, flashcards & quiz
+- [x] Drag & drop upload
+- [x] Live voice recording
+- [x] Flip flashcards
+- [x] Quiz scoring system
+- [x] PDF export
+- [x] Copy notes & session history
+- [ ] User accounts & cloud history
+- [ ] Multi-language support
+- [ ] Export to Anki / Notion
+
+---
+
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
