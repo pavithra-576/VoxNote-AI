@@ -2,6 +2,11 @@
 Turn lectures into knowledge — instantly.
 VoxNote AI converts any lecture, meeting, or audio recording into structured study notes, smart flashcards, and interactive quizzes using Whisper for transcription and Groq (Llama 3.3 70B) for AI analysis.
 
+# Problem statement 
+Lecture Voice-to-Notes Generator Students frequently miss key points during lectures as it’s difficult to listen and write notes simultaneously. A solution is required that can convert spoken lectures into text using speech to-text AI and then summarize the content into clear study notes, quizzes, or flashcards using generative AI.
+<img width="6593" height="105" alt="image" src="https://github.com/user-attachments/assets/fb093050-d805-4c25-9f53-c11539390c2e" />
+
+
 ## 📸 Preview
 
 <img width="1720" height="877" alt="image" src="https://github.com/user-attachments/assets/811938be-1d81-4f1a-a068-8f1a9f388277" />
