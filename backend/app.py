@@ -10,8 +10,16 @@ from stage2_processor import process_transcript
 
 app = Flask(__name__)
 
-# ── CORS: allow ALL origins (fixes frontend fetch being blocked) ───────────────
-CORS(app, resources={r"/*": {"origins": "*"}})
+# ── CORS: allow all origins ───────────────────────────────────────────────────
+CORS(app, resources={r"/*": {
+    "origins": ["http://127.0.0.1:5500",
+                "http://localhost:5500",
+                "http://127.0.0.1:5000",
+                "null",
+                "*"],
+    "methods": ["GET", "POST", "OPTIONS"],
+    "allow_headers": ["Content-Type"]
+}})
 
 UPLOAD_FOLDER = "uploads"
 ALLOWED_EXTENSIONS = {"mp3", "wav", "m4a", "mp4", "ogg", "webm"}
@@ -21,9 +29,12 @@ app.config["MAX_CONTENT_LENGTH"] = 500 * 1024 * 1024   # 500 MB max
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# ── Load Whisper — use tiny on Render free tier (saves RAM) ──────────────────
+WHISPER_MODEL = os.environ.get("WHISPER_MODEL", "tiny")
+
 print("=" * 50)
-print("Loading Whisper Model...")
-model = whisper.load_model("base")
+print(f"Loading Whisper Model ({WHISPER_MODEL})...")
+model = whisper.load_model(WHISPER_MODEL)
 print("Whisper Loaded Successfully")
 print("=" * 50)
 
@@ -56,7 +67,7 @@ def transcribe_audio(file_path):
     return text
 
 
-# ─── OPTIONS preflight handler (fixes CORS preflight failures) ────────────────
+# ─── OPTIONS preflight handler ────────────────────────────────────────────────
 @app.route("/upload", methods=["OPTIONS"])
 def upload_preflight():
     response = jsonify({"status": "ok"})
@@ -70,8 +81,9 @@ def upload_preflight():
 @app.route("/")
 def home():
     return jsonify({
-        "status": "running",
-        "message": "VoxNote AI Backend is running"
+        "status":  "running",
+        "message": "VoxNote AI Backend is running",
+        "model":   WHISPER_MODEL
     })
 
 
@@ -86,9 +98,9 @@ def test_groq():
     )
     analysis = process_transcript(dummy)
     return jsonify({
-        "status": "ok",
+        "status":     "ok",
         "transcript": dummy,
-        "analysis": analysis
+        "analysis":   analysis
     })
 
 
@@ -102,11 +114,10 @@ def upload_file():
         print(f"Files in req : {list(request.files.keys())}")
         print("=" * 50)
 
-        # ── 1. Validate file presence ─────────────────────────────────────────
+        # ── 1. Validate ───────────────────────────────────────────────────────
         if "file" not in request.files:
-            print("ERROR: 'file' key missing from request.files")
-            print("All form keys:", list(request.form.keys()))
-            return jsonify({"error": "No file uploaded. Make sure the field name is 'file'."}), 400
+            print("ERROR: 'file' key missing")
+            return jsonify({"error": "No file uploaded. Field name must be 'file'."}), 400
 
         file = request.files["file"]
 
@@ -114,7 +125,10 @@ def upload_file():
             print("ERROR: Empty filename")
             return jsonify({"error": "No file selected"}), 400
 
-        # ── 2. Secure & save ──────────────────────────────────────────────────
+        if not allowed_file(file.filename):
+            return jsonify({"error": "File type not allowed. Use mp3, wav, m4a, or mp4."}), 400
+
+        # ── 2. Save ───────────────────────────────────────────────────────────
         filename = secure_filename(file.filename)
         if not filename:
             filename = f"upload_{int(time.time())}.wav"
@@ -147,7 +161,7 @@ def upload_file():
         print(str(analysis)[:400])
         print("============================")
 
-        # ── 5. Clean up uploaded file (optional — saves disk space) ──────────
+        # ── 5. Clean up ───────────────────────────────────────────────────────
         try:
             os.remove(filepath)
         except Exception:
@@ -167,5 +181,9 @@ def upload_file():
         return jsonify({"error": str(e)}), 500
 
 
+# ── Start server ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))   # Render sets PORT automatically
+    debug = os.environ.get("RENDER") is None   # debug=True locally, False on Render
+    print(f"Starting server on port {port}, debug={debug}")
+    app.run(host="0.0.0.0", port=port, debug=debug)
