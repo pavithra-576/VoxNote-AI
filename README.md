@@ -69,7 +69,7 @@ VoxNote-AI/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/VoxNote-AI.git
+git clone https://github.com/pavithra-576/VoxNote-AI.git
 cd VoxNote-AI
 ```
 
